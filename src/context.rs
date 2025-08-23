@@ -9,7 +9,6 @@ pub struct AppContext {
     pub github_client: Option<Arc<GitHubClient>>,
 }
 
-// 임시 구조체 - 추후 실제 구현
 pub struct JiraClient {
     pub base_url: String,
     pub username: String,
@@ -59,50 +58,23 @@ impl AppContext {
             .map(|c| c.as_ref())
             .ok_or_else(|| AppError::config_error("GitHub 클라이언트가 초기화되지 않았습니다"))
     }
-}
-
-impl Config {
-    pub fn from_env() -> AppResult<Self> {
-        dotenv::dotenv().ok();
-        
-        Ok(Config {
-            jira_url: std::env::var("JIRA_URL")
-                .map_err(|_| AppError::config_error("JIRA_URL이 설정되지 않았습니다"))?,
-            jira_project: std::env::var("JIRA_PROJECT")
-                .map_err(|_| AppError::config_error("JIRA_PROJECT가 설정되지 않았습니다"))?,
-            jira_username: std::env::var("JIRA_USERNAME")
-                .map_err(|_| AppError::config_error("JIRA_USERNAME이 설정되지 않았습니다"))?,
-            jira_token: std::env::var("JIRA_TOKEN")
-                .map_err(|_| AppError::config_error("JIRA_TOKEN이 설정되지 않았습니다"))?,
-            
-            github_token: std::env::var("GITHUB_TOKEN")
-                .map_err(|_| AppError::config_error("GITHUB_TOKEN이 설정되지 않았습니다"))?,
-            repo_owner: std::env::var("REPO_OWNER")
-                .map_err(|_| AppError::config_error("REPO_OWNER가 설정되지 않았습니다"))?,
-            repo_name: std::env::var("REPO_NAME")
-                .map_err(|_| AppError::config_error("REPO_NAME이 설정되지 않았습니다"))?,
-            
-            default_branch: std::env::var("DEFAULT_BRANCH")
-                .unwrap_or_else(|_| "main".to_string()),
-            
-            project_name: std::env::var("PROJECT_NAME")
-                .unwrap_or_else(|_| "project".to_string()),
-        })
-    }
     
-    pub fn validate(&self) -> AppResult<()> {
-        if self.jira_url.is_empty() {
-            return Err(AppError::validation_error("JIRA_URL이 비어있습니다"));
-        }
+    pub async fn init_clients(mut self) -> AppResult<Self> {
+        let jira_client = JiraClient {
+            base_url: self.config.get_jira_base_url(),
+            username: self.config.jira_username.clone(),
+            token: self.config.jira_token.clone(),
+            project_key: self.config.jira_project.clone(),
+        };
+        self.jira_client = Some(Arc::new(jira_client));
         
-        if !self.jira_url.starts_with("https://") && !self.jira_url.starts_with("http://") {
-            return Err(AppError::validation_error("JIRA_URL은 http:// 또는 https://로 시작해야 합니다"));
-        }
+        let github_client = GitHubClient {
+            token: self.config.github_token.clone(),
+            owner: self.config.repo_owner.clone(),
+            repo: self.config.repo_name.clone(),
+        };
+        self.github_client = Some(Arc::new(github_client));
         
-        if self.github_token.is_empty() {
-            return Err(AppError::validation_error("GITHUB_TOKEN이 비어있습니다"));
-        }
-        
-        Ok(())
+        Ok(self)
     }
 }

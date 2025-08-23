@@ -12,33 +12,28 @@ pub struct AppError {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 #[serde(tag = "error", content = "message", rename_all = "snake_case")]
 pub enum AppErrorType {
-    // System errors
     NotFound(String),
     IoError(String),
     ConfigError(String),
     ValidationError(String),
     
-    // Git errors
     GitError(String),
     GitBranchExists,
     GitNoCurrentBranch,
     GitUncommittedChanges,
     
-    // Jira errors
     JiraConnectionError,
     JiraAuthenticationError,
     JiraTicketNotFound(String),
     JiraTransitionNotAllowed,
     JiraApiError(String),
     
-    // GitHub errors
     GitHubConnectionError,
     GitHubAuthenticationError,
     GitHubRepoNotFound,
     GitHubPrCreateFailed,
     GitHubApiError(String),
     
-    // Generic
     Unknown(String),
 }
 
@@ -121,7 +116,6 @@ impl AppError {
     }
 }
 
-// Extension trait for convenient error conversion
 pub trait AppErrorExt<T, E> {
     fn with_app_type(self, error_type: AppErrorType) -> AppResult<T>;
 }
