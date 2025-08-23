@@ -26,7 +26,12 @@ impl GitOps {
     }
     
     pub fn is_clean_working_directory(&self) -> AppResult<bool> {
-        let statuses = self.repo.statuses(None)
+        let mut opts = git2::StatusOptions::new();
+        opts.include_untracked(true)
+            .include_ignored(false)
+            .include_unreadable(false);
+        
+        let statuses = self.repo.statuses(Some(&mut opts))
             .with_app_type(AppErrorType::GitError("상태 확인 실패".to_string()))?;
         
         Ok(statuses.is_empty())
@@ -97,36 +102,16 @@ impl GitOps {
             self.checkout_branch(branch_name)?;
         }
         
-        let mut remote = self.repo.find_remote("origin")
-            .with_app_type(AppErrorType::GitError("origin 리모트를 찾을 수 없습니다".to_string()))?;
+        use std::process::Command;
         
-        let refspec = format!("refs/heads/{}:refs/remotes/origin/{}", branch_name, branch_name);
-        remote.fetch(&[&refspec], None, None)
-            .with_app_type(AppErrorType::GitError("Fetch 실패".to_string()))?;
+        let output = Command::new("git")
+            .args(&["pull", "origin", branch_name])
+            .output()
+            .with_app_type(AppErrorType::GitError("Git pull 명령 실행 실패".to_string()))?;
         
-        let fetch_head = self.repo.fetchhead_foreach(|ref_name, remote_url, oid, is_merge| {
-            true
-        });
-        
-        let remote_commit = self.repo.find_commit(
-            self.repo.find_branch(&format!("origin/{}", branch_name), BranchType::Remote)?
-                .get()
-                .target()
-                .unwrap()
-        ).with_app_type(AppErrorType::GitError("원격 커밋을 찾을 수 없습니다".to_string()))?;
-        
-        let local_commit = self.repo.head()?.peel_to_commit()
-            .with_app_type(AppErrorType::GitError("로컬 커밋을 찾을 수 없습니다".to_string()))?;
-        
-        if local_commit.id() != remote_commit.id() {
-            let mut index = self.repo.index()
-                .with_app_type(AppErrorType::GitError("인덱스를 가져올 수 없습니다".to_string()))?;
-            
-            let tree = remote_commit.tree()
-                .with_app_type(AppErrorType::GitError("트리를 가져올 수 없습니다".to_string()))?;
-            
-            self.repo.reset(&remote_commit.as_object(), git2::ResetType::Hard, None)
-                .with_app_type(AppErrorType::GitError("Reset 실패".to_string()))?;
+        if !output.status.success() {
+            let error_msg = String::from_utf8_lossy(&output.stderr);
+            return Err(AppErrorType::GitError(format!("Git pull 실패: {}", error_msg)).into());
         }
         
         Ok(())
