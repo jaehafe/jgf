@@ -1,18 +1,18 @@
-use crate::error::{AppError, AppResult};
+use crate::error::{AppError, AppErrorExt, AppResult};
 use colored::Colorize;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::time::Duration;
+use crate::AppErrorType;
 
 pub fn create_spinner(message: &str) -> ProgressBar {
     let spinner = ProgressBar::new_spinner();
     spinner.set_style(
-        ProgressStyle::default_spinner()
-            .template("{spinner:.cyan} {msg}")
+        ProgressStyle::with_template("{spinner:.cyan} {msg}")
             .unwrap()
-            .tick_strings(&["⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"]),
+            .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈")
     );
     spinner.set_message(message.to_string());
-    spinner.enable_steady_tick(Duration::from_millis(100));
+    spinner.enable_steady_tick(Duration::from_millis(120));
     spinner
 }
 
@@ -36,7 +36,7 @@ pub fn prompt_confirmation(message: &str) -> AppResult<bool> {
     let answer = inquire::Confirm::new(message)
         .with_default(false)
         .prompt()
-        .map_err(|e| AppError::validation_error(format!("입력 오류: {}", e)))?;
+        .with_app_type(AppErrorType::IoError("입력 오류 발생".to_string()))?;
     
     Ok(answer)
 }
