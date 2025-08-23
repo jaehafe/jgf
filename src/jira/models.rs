@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use chrono::{DateTime, Utc};
+use strum::{Display, EnumString};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Issue {
@@ -126,4 +127,14 @@ impl Issue {
             .map(|p| p.name.clone())
             .unwrap_or_else(|| "없음".to_string())
     }
+}
+
+#[derive(Debug, Clone, Display, EnumString)]
+pub enum TicketAction {
+    #[strum(to_string = "브랜치 생성 및 In Progress로 변경")]
+    CreateBranch,
+    #[strum(to_string = "브라우저에서 열기")]
+    OpenBrowser,
+    #[strum(to_string = "취소")]
+    Cancel,
 }
