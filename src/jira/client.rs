@@ -224,12 +224,35 @@ impl JiraClient {
     }
     
     pub async fn transition_to_status(&self, issue_key: &str, target_status: &str) -> AppResult<()> {
-        if let Some(transition_id) = self.find_transition_by_name(issue_key, target_status).await? {
+        let transitions = self.get_transitions(issue_key).await?;
+        
+        // 가능한 전환 상태 찾기
+        let mut found_transition: Option<String> = None;
+        let mut available_statuses: Vec<String> = Vec::new();
+        
+        for transition in &transitions {
+            available_statuses.push(format!("{} ({})", transition.name, transition.to.name));
+            
+            if transition.name.to_lowercase() == target_status.to_lowercase() ||
+               transition.to.name.to_lowercase() == target_status.to_lowercase() ||
+               (target_status == "In Review" && (transition.to.name == "리뷰 중" || transition.to.name == "검토 중" || transition.to.name == "Review")) {
+                found_transition = Some(transition.id.clone());
+                break;
+            }
+        }
+        
+        if let Some(transition_id) = found_transition {
             self.transition_issue(issue_key, &transition_id).await
         } else {
+            let available = if available_statuses.is_empty() {
+                "전환 가능한 상태 없음".to_string()
+            } else {
+                format!("가능한 상태: {}", available_statuses.join(", "))
+            };
+            
             Err(AppError::jira_api_error(format!(
-                "이슈 {}에서 '{}' 상태로 전환할 수 없습니다", 
-                issue_key, target_status
+                "이슈 {}에서 '{}' 상태로 전환할 수 없습니다. {}", 
+                issue_key, target_status, available
             )))
         }
     }

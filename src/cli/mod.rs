@@ -36,13 +36,7 @@ pub enum Commands {
     },
     
     #[command(about = "현재 브랜치로 PR 생성 및 In Review 상태로 변경")]
-    Pr {
-        #[arg(short, long, help = "PR 제목")]
-        title: Option<String>,
-        
-        #[arg(short, long, help = "PR 설명")]
-        description: Option<String>,
-    },
+    Pr,
     
     #[command(about = "머지된 브랜치 확인 및 Done 상태로 변경")]
     Sync,
@@ -54,7 +48,7 @@ impl Cli {
             Some(Commands::Init) => commands::init::run().await,
             Some(Commands::Tickets { limit, status, interactive }) => commands::tickets::run(limit, status, interactive).await,
             Some(Commands::Start { ticket }) => commands::start::run(ticket).await,
-            Some(Commands::Pr { title, description }) => commands::pr::run(title, description).await,
+            Some(Commands::Pr) => commands::pr::run().await,
             Some(Commands::Sync) => commands::sync::run().await,
             None => {
                 utils::info_message("사용법: jgf <command>");
