@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::error::{AppError, AppResult};
+use crate::jira::JiraClient;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -7,13 +8,6 @@ pub struct AppContext {
     pub config: Arc<Config>,
     pub jira_client: Option<Arc<JiraClient>>,
     pub github_client: Option<Arc<GitHubClient>>,
-}
-
-pub struct JiraClient {
-    pub base_url: String,
-    pub username: String,
-    pub token: String,
-    pub project_key: String,
 }
 
 pub struct GitHubClient {
@@ -60,12 +54,12 @@ impl AppContext {
     }
     
     pub async fn init_clients(mut self) -> AppResult<Self> {
-        let jira_client = JiraClient {
-            base_url: self.config.get_jira_base_url(),
-            username: self.config.jira_username.clone(),
-            token: self.config.jira_token.clone(),
-            project_key: self.config.jira_project.clone(),
-        };
+        let jira_client = JiraClient::new(
+            self.config.get_jira_base_url(),
+            self.config.jira_username.clone(),
+            self.config.jira_token.clone(),
+            self.config.jira_project.clone(),
+        )?;
         self.jira_client = Some(Arc::new(jira_client));
         
         let github_client = GitHubClient {
