@@ -108,24 +108,8 @@ impl Config {
         format!("{}/browse/{}", self.get_jira_base_url(), ticket_key)
     }
     
-    pub fn format_branch_name(&self, ticket_key: &str, summary: Option<&str>) -> String {
-        match summary {
-            Some(s) => {
-                let clean_summary = s
-                    .to_lowercase()
-                    .chars()
-                    .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
-                    .collect::<String>()
-                    .split('-')
-                    .filter(|s| !s.is_empty())
-                    .take(5)
-                    .collect::<Vec<_>>()
-                    .join("-");
-                
-                format!("feature/{}-{}", ticket_key.to_lowercase(), clean_summary)
-            }
-            None => format!("feature/{}", ticket_key.to_lowercase()),
-        }
+    pub fn format_branch_name(&self, ticket_key: &str, _summary: Option<&str>) -> String {
+        ticket_key.to_uppercase()
     }
     
     pub fn display_info(&self) {
