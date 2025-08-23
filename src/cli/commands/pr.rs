@@ -20,7 +20,8 @@ pub async fn run() -> AppResult<()> {
         }
     }
     
-    utils::info_message(&format!("브랜치 '{}'에서 '{}'으로 PR을 생성합니다.", current_branch, config.default_branch));
+    utils::rocket_message(&format!("브랜치 '{}'에서 '{}'으로 PR 생성", current_branch, config.default_branch));
+    println!();
     
     let context = AppContext::new(config).init_clients().await?;
     
@@ -31,10 +32,11 @@ pub async fn run() -> AppResult<()> {
         return Ok(());
     };
     
-    utils::info_message(&format!("Jira 티켓 {}의 정보를 조회합니다.", ticket_key));
+    let spinner = utils::create_spinner(&format!("Jira 티켓 {} 정보 조회 중...", ticket_key));
     
     let (title, body) = match context.jira_client()?.get_issue(&ticket_key).await {
         Ok(issue) => {
+            spinner.finish_and_clear();
             let title = format!("[{}] {}", issue.key, issue.fields.summary);
             let jira_url = context.config().get_jira_ticket_url(&issue.key);
             let body = format!(
@@ -44,6 +46,7 @@ pub async fn run() -> AppResult<()> {
             (title, body)
         }
         Err(e) => {
+            spinner.finish_and_clear();
             utils::warning_message(&format!("티켓 정보 조회 실패: {}", e));
             let title = format!("[{}] 제목을 입력해주세요", ticket_key);
             let jira_url = context.config().get_jira_ticket_url(&ticket_key);
@@ -55,7 +58,7 @@ pub async fn run() -> AppResult<()> {
         }
     };
     
-    utils::info_message("GitHub에 PR을 생성합니다.");
+    let spinner = utils::create_spinner("GitHub에 PR 생성 중...");
     
     match context.github_client()?.create_pull_request(
         &title,
@@ -64,6 +67,7 @@ pub async fn run() -> AppResult<()> {
         &context.config().default_branch,
     ).await {
         Ok(pr) => {
+            spinner.finish_and_clear();
             utils::success_message(&format!("PR이 성공적으로 생성되었습니다! #{}", pr.number));
             utils::info_message(&format!("PR 링크: {}", pr.html_url));
             
@@ -82,6 +86,7 @@ pub async fn run() -> AppResult<()> {
             }
         }
         Err(e) => {
+            spinner.finish_and_clear();
             let error_msg = format!("{}", e);
             if error_msg.contains("already exists") {
                 utils::warning_message(&format!("브랜치 '{}'에 대한 PR이 이미 존재합니다.", current_branch));
