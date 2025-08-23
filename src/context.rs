@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::error::{AppError, AppResult};
 use crate::jira::JiraClient;
+use crate::github::GitHubClient;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -10,11 +11,6 @@ pub struct AppContext {
     pub github_client: Option<Arc<GitHubClient>>,
 }
 
-pub struct GitHubClient {
-    pub token: String,
-    pub owner: String,
-    pub repo: String,
-}
 
 impl AppContext {
     pub fn new(config: Config) -> Self {
@@ -62,11 +58,7 @@ impl AppContext {
         )?;
         self.jira_client = Some(Arc::new(jira_client));
         
-        let github_client = GitHubClient {
-            token: self.config.github_token.clone(),
-            owner: self.config.repo_owner.clone(),
-            repo: self.config.repo_name.clone(),
-        };
+        let github_client = GitHubClient::new(&self.config)?;
         self.github_client = Some(Arc::new(github_client));
         
         Ok(self)
