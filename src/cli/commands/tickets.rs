@@ -79,8 +79,7 @@ pub async fn run(limit: Option<i32>, status_filter: Option<String>, interactive:
             
             match selected_action {
                 TicketAction::CreateBranch => {
-                    utils::info_message(&format!("{} 브랜치를 생성하고 상태를 변경합니다.", selected_issue.key));
-                    utils::warning_message("이 기능은 아직 구현되지 않았습니다.");
+                    crate::cli::commands::start::run(selected_issue.key.clone()).await?;
                 }
                 TicketAction::OpenBrowser => {
                     let url = context.config().get_jira_ticket_url(&selected_issue.key);
