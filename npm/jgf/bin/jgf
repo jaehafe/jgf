@@ -60,32 +60,32 @@ const { platform, arch, env, version, release } = process;
 const PLATFORMS = {
   win32: {
     x64: {
-      musl: "@jgf/win32-x64/jgf.exe",
-      gnu: "@jgf/win32-x64/jgf.exe",
+      musl: "jgf-win32-x64/jgf.exe",
+      gnu: "jgf-win32-x64/jgf.exe",
     },
     arm64: {
-      musl: "@jgf/win32-arm64/jgf.exe",
-      gnu: "@jgf/win32-arm64/jgf.exe",
+      musl: "jgf-win32-arm64/jgf.exe",
+      gnu: "jgf-win32-arm64/jgf.exe",
     },
   },
   darwin: {
     x64: {
-      musl: "@jgf/darwin-x64/jgf",
-      gnu: "@jgf/darwin-x64/jgf",
+      musl: "jgf-darwin-x64/jgf",
+      gnu: "jgf-darwin-x64/jgf",
     },
     arm64: {
-      musl: "@jgf/darwin-arm64/jgf",
-      gnu: "@jgf/darwin-arm64/jgf",
+      musl: "jgf-darwin-arm64/jgf",
+      gnu: "jgf-darwin-arm64/jgf",
     },
   },
   linux: {
     x64: {
-      musl: "@jgf/linux-x64-musl/jgf",
-      gnu: "@jgf/linux-x64-gnu/jgf",
+      musl: "jgf-linux-x64-musl/jgf",
+      gnu: "jgf-linux-x64-gnu/jgf",
     },
     arm64: {
-      musl: "@jgf/linux-arm64-musl/jgf",
-      gnu: "@jgf/linux-arm64-gnu/jgf",
+      musl: "jgf-linux-arm64-musl/jgf",
+      gnu: "jgf-linux-arm64-gnu/jgf",
     },
   },
 };

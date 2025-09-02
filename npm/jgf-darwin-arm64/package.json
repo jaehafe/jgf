@@ -1,0 +1,17 @@
+{
+  "name": "jgf-darwin-arm64",
+  "version": "0.1.5",
+  "author": "Lee Jaeha <wogkdkrm112@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/jaehafe/jgf",
+  "bugs": "https://github.com/jaehafe/jgf/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaehafe/jgf.git"
+  },
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "publishConfig": {
+    "executableFiles": ["jgf"]
+  }
+}
