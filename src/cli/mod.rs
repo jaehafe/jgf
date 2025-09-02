@@ -6,7 +6,7 @@ use crate::AppResult;
 #[derive(Parser)]
 #[command(name = "jgf")]
 #[command(about = "Jira Git Flow - Jira와 Git을 연동하는 CLI 도구")]
-#[command(version = "0.1.0")]
+#[command(version = env!("CARGO_PKG_VERSION"))]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Commands>,
