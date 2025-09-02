@@ -63,11 +63,11 @@ Git 브랜치:  없음 → EM-XXX 생성 → PR → 머지 → 삭제
 
 #### Option 1: Cargo를 통한 설치 (Rust 필요)
 ```bash
-# crates.io에서 설치 (예정)
-cargo install jgf-cli
+# crates.io에서 설치
+cargo install jgf
 
 # 또는 소스에서 빌드
-git clone https://github.com/yourusername/jgf.git
+git clone https://github.com/jaehafe/jgf.git
 cd jgf
 cargo install --path .
 ```
@@ -75,17 +75,17 @@ cargo install --path .
 #### Option 2: 바이너리 직접 다운로드 (Rust 불필요)
 ```bash
 # macOS (Apple Silicon)
-curl -L https://github.com/yourusername/jgf/releases/latest/download/jgf-darwin-aarch64 -o jgf
+curl -L https://github.com/jaehafe/jgf/releases/latest/download/jgf-darwin-aarch64 -o jgf
 chmod +x jgf
 sudo mv jgf /usr/local/bin/
 
 # macOS (Intel)
-curl -L https://github.com/yourusername/jgf/releases/latest/download/jgf-darwin-x64 -o jgf
+curl -L https://github.com/jaehafe/jgf/releases/latest/download/jgf-darwin-x64 -o jgf
 chmod +x jgf
 sudo mv jgf /usr/local/bin/
 
 # Linux
-curl -L https://github.com/yourusername/jgf/releases/latest/download/jgf-linux-x64 -o jgf
+curl -L https://github.com/jaehafe/jgf/releases/latest/download/jgf-linux-x64 -o jgf
 chmod +x jgf
 sudo mv jgf /usr/local/bin/
 ```
