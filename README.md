@@ -115,7 +115,11 @@ jgf init
     "owner": "YourOrg",
     "repo": "your-repo"
   },
-  "defaultBranch": "develop"
+  "defaultBranch": "develop",
+  "prTemplate": {  // 선택사항
+    "path": "custom/pr_template.md"  // 또는
+    // "content": "직접 템플릿 내용..."
+  }
 }
 ```
 
@@ -200,7 +204,8 @@ jgf pr
 **자동 수행 작업:**
 - ✅ 현재 브랜치에서 develop으로 PR 생성
 - ✅ PR 제목: `[EM-100] 티켓 제목`
-- ✅ PR 본문에 Jira 링크 자동 포함
+- ✅ 프로젝트의 PR 템플릿 자동 탐색 및 적용
+- ✅ PR 본문에 Jira 링크 및 티켓 정보 자동 삽입
 - ✅ PR이 이미 존재하면 링크 안내
 
 ### 4. 머지 후 동기화
@@ -281,13 +286,42 @@ $ jgf sync
 - 기본: `{JIRA_TICKET_NUMBER}` (예: `EM-100`)
 - 수정 필요시 `src/config.rs`의 `format_branch_name()` 함수 수정
 
-### PR 템플릿 자동 탐색
-jgf는 프로젝트의 PR 템플릿을 자동으로 찾아 사용합니다:
-- `.github/pull_request_template.md`
-- `.github/PULL_REQUEST_TEMPLATE.md`
-- `pull_request_template.md`
-- `docs/pull_request_template.md`
-- `.gitlab/merge_request_templates/default.md`
+### PR 템플릿 기능
+
+#### 템플릿 우선순위
+1. **프로젝트의 PR 템플릿 파일** (자동 탐색)
+   - `.github/pull_request_template.md`
+   - `.github/PULL_REQUEST_TEMPLATE.md`
+   - `pull_request_template.md`
+   - `docs/pull_request_template.md`
+   - `.gitlab/merge_request_templates/default.md`
+
+2. **jgf.json에 정의된 템플릿**
+   - `prTemplate.path`: 커스텀 경로 지정
+   - `prTemplate.content`: 직접 템플릿 내용 작성
+
+3. **기본 내장 템플릿**
+
+#### 템플릿 변수
+jgf는 PR 템플릿에서 다음 변수를 자동 치환합니다:
+- `{{TICKET_KEY}}` - Jira 티켓 번호 (예: EM-100)
+- `{{TICKET_URL}}` - Jira 티켓 URL
+- `{{TICKET_TITLE}}` - Jira 티켓 제목
+- `{{BRANCH_NAME}}` - 현재 브랜치명
+
+#### 템플릿 예시
+```markdown
+## 🎫 티켓
+{{TICKET_URL}}
+
+## 📝 작업 내용
+- 
+
+## ✅ 체크리스트
+- [ ] 테스트 작성
+- [ ] 문서 업데이트
+- [ ] 코드 리뷰 요청
+```
 
 ### 여러 프로젝트 관리
 각 프로젝트에 독립적인 `jgf.json`을 생성하여 관리:
