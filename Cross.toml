@@ -5,3 +5,9 @@ passthrough = [
     "CARGO_HOME",
     "CARGO_TARGET_DIR",
 ]
+
+# Linux targets
+[target.x86_64-unknown-linux-gnu]
+[target.aarch64-unknown-linux-gnu] 
+[target.x86_64-unknown-linux-musl]
+[target.aarch64-unknown-linux-musl]

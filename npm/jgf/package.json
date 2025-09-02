@@ -1,6 +1,6 @@
 {
   "name": "jgf",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "commonjs",
   "description": "Jira-GitHub Flow CLI tool for seamless project management",
   "keywords": ["jira", "github", "cli", "workflow", "productivity"],

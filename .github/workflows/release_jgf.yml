@@ -103,7 +103,7 @@ jobs:
       - name: Build
         shell: bash
         env:
-          TARGET_CC: clang
+          CARGO_NET_GIT_FETCH_WITH_CLI: true
         run: |
           cross build --release --bin jgf --target=${{ matrix.target }}
 
