@@ -6,7 +6,7 @@ pub async fn run(ticket: String) -> AppResult<()> {
     utils::rocket_message(&format!("티켓 {} 작업을 시작합니다", ticket));
     println!();
     
-    let config = Config::from_env()?;
+    let config = Config::load()?;
     config.validate()?;
     
     let git_ops = GitOps::open()?;

@@ -1,7 +1,7 @@
 use crate::{AppResult, AppContext, Config, git::GitOps, utils};
 
 pub async fn run() -> AppResult<()> {
-    let config = Config::from_env()?;
+    let config = Config::load()?;
     config.validate()?;
     
     let git_ops = GitOps::open()?;

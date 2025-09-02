@@ -3,7 +3,7 @@ use crate::jira::models::TicketAction;
 use colored::Colorize;
 
 pub async fn run(limit: Option<i32>, status_filter: Option<String>, interactive: Option<bool>) -> AppResult<()> {
-    let config = Config::from_env()?;
+    let config = Config::load()?;
     config.validate()?;
     
     let context = AppContext::new(config).init_clients().await?;
