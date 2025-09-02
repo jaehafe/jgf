@@ -1,6 +1,6 @@
 {
   "name": "jgf",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "commonjs",
   "description": "Jira-GitHub Flow CLI tool for seamless project management",
   "keywords": ["jira", "github", "cli", "workflow", "productivity"],
@@ -24,6 +24,13 @@
     "README.md"
   ],
   "optionalDependencies": {
-    "jgf-darwin-arm64": "0.1.5"
+    "jgf-win32-x64": "0.1.8",
+    "jgf-win32-arm64": "0.1.8",
+    "jgf-linux-x64-gnu": "0.1.8",
+    "jgf-linux-arm64-gnu": "0.1.8",
+    "jgf-linux-x64-musl": "0.1.8",
+    "jgf-linux-arm64-musl": "0.1.8",
+    "jgf-darwin-x64": "0.1.8",
+    "jgf-darwin-arm64": "0.1.8"
   }
 }
