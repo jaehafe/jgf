@@ -1,7 +1,15 @@
 [package]
 name = "jgf"
 version = "0.1.0"
+authors = ["Lee Jaeha <wogkdkrm112@gmail.com>"]
 edition = "2024"
+description = "Jira-GitHub Flow CLI tool for seamless project management"
+license = "MIT"
+repository = "https://github.com/jaehafe/jgf"
+homepage = "https://github.com/jaehafe/jgf"
+readme = "README.md"
+keywords = ["jira", "github", "cli", "workflow", "productivity"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 anyhow = "1.0.99"
