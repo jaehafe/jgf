@@ -109,45 +109,24 @@ jgf init
   "jira": {
     "url": "https://your-company.atlassian.net",
     "project": "EM",
-    "username": "your-email@company.com"  // 선택사항
+    "username": "your-email@company.com"  // Optional
   },
   "github": {
     "owner": "YourOrg",
     "repo": "your-repo"
   },
   "defaultBranch": "develop",
-  "prTemplate": {  // 선택사항
+  "prTemplate": {  // Optional
     "path": "custom/pr_template.md"  // 또는
     // "content": "직접 템플릿 내용..."
   }
 }
 ```
 
-#### 2. `.env` - 토큰 정보 (`.gitignore`에 추가 필수)
+#### 2. `.env` - 토큰 정보
 ```env
-# 토큰 정보는 .env 파일에 저장합니다
 JIRA_TOKEN=your-jira-api-token
 GITHUB_TOKEN=ghp_your_github_token
-
-# Optional: jgf.json에 username이 없을 경우 사용
-# JIRA_USERNAME=your-email@company.com
-```
-
-⚠️ **중요**: `.env` 파일은 반드시 `.gitignore`에 추가하세요!
-
-### 레거시 설정 (하위 호환성)
-
-`jgf.json` 없이 `.env` 파일만으로도 작동합니다:
-```env
-JIRA_URL=https://your-company.atlassian.net
-JIRA_PROJECT=EM
-JIRA_USERNAME=your-email@company.com
-JIRA_TOKEN=your-jira-api-token
-GITHUB_TOKEN=ghp_your_github_token
-REPO_OWNER=YourOrg
-REPO_NAME=your-repo
-DEFAULT_BRANCH=develop
-PROJECT_NAME=your-project
 ```
 
 ### API 토큰 발급 방법
