@@ -12,6 +12,16 @@ pub struct ProjectConfig {
     pub github: GithubConfig,
     #[serde(rename = "defaultBranch")]
     pub default_branch: String,
+    #[serde(rename = "prTemplate", skip_serializing_if = "Option::is_none")]
+    pub pr_template: Option<PrTemplate>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PrTemplate {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -44,6 +54,7 @@ pub struct Config {
     pub project_name: String,
     
     pub project_root: Option<PathBuf>,
+    pub pr_template_content: Option<String>,
 }
 
 impl Config {
@@ -82,7 +93,7 @@ impl Config {
         let content = fs::read_to_string(config_path)
             .map_err(|e| AppError::config_error(format!("설정 파일을 읽을 수 없습니다: {}", e)))?;
         
-        let project_config: ProjectConfig = serde_json::from_str(&content)
+        let mut project_config: ProjectConfig = serde_json::from_str(&content)
             .map_err(|e| AppError::config_error(format!("설정 파일 파싱 실패: {}", e)))?;
         
         if let Some(ref root) = project_root {
@@ -102,7 +113,7 @@ impl Config {
         let github_token = env::var("GITHUB_TOKEN")
             .with_app_type(AppErrorType::ConfigError("GITHUB_TOKEN이 .env 파일에 설정되지 않았습니다".into()))?;
         
-        Ok(Config {
+        let mut config = Config {
             jira_url: project_config.jira.url,
             jira_project: project_config.jira.project,
             jira_username,
@@ -117,7 +128,25 @@ impl Config {
             project_name: project_config.project,
             
             project_root,
-        })
+            pr_template_content: None,
+        };
+        
+        if let Some(template) = project_config.pr_template {
+            if let Some(path) = template.path {
+                if let Some(root) = &config.project_root {
+                    let template_path = root.join(&path);
+                    if template_path.exists() {
+                        if let Ok(content) = fs::read_to_string(&template_path) {
+                            config.pr_template_content = Some(content);
+                        }
+                    }
+                }
+            } else if let Some(content) = template.content {
+                config.pr_template_content = Some(content);
+            }
+        }
+        
+        Ok(config)
     }
     
     pub fn from_env() -> AppResult<Self> {
@@ -147,6 +176,7 @@ impl Config {
                 .unwrap_or_else(|_| "project".to_string()),
             
             project_root: None,
+            pr_template_content: None,
         })
     }
     
@@ -199,6 +229,7 @@ impl Config {
                 repo: "your-repo".to_string(),
             },
             default_branch: "main".to_string(),
+            pr_template: None,
         };
         
         let config_content = serde_json::to_string_pretty(&project_config)
@@ -261,22 +292,24 @@ impl Config {
         println!();
     }
     
-    pub fn get_pr_template_path(&self) -> Option<PathBuf> {
-        let root = self.project_root.as_ref()?;
-        
-        let possible_paths = vec![
-            root.join(".github").join("pull_request_template.md"),
-            root.join(".github").join("PULL_REQUEST_TEMPLATE.md"),
-            root.join("pull_request_template.md"),
-            root.join("PULL_REQUEST_TEMPLATE.md"),
-            root.join("docs").join("pull_request_template.md"),
-            root.join("docs").join("PULL_REQUEST_TEMPLATE.md"),
-            root.join(".gitlab").join("merge_request_templates").join("default.md"),
-        ];
-        
-        for path in possible_paths {
-            if path.exists() {
-                return Some(path);
+    pub fn get_pr_template(&self) -> Option<String> {
+        if let Some(root) = &self.project_root {
+            let possible_paths = vec![
+                root.join(".github").join("pull_request_template.md"),
+                root.join(".github").join("PULL_REQUEST_TEMPLATE.md"),
+                root.join("pull_request_template.md"),
+                root.join("PULL_REQUEST_TEMPLATE.md"),
+                root.join("docs").join("pull_request_template.md"),
+                root.join("docs").join("PULL_REQUEST_TEMPLATE.md"),
+                root.join(".gitlab").join("merge_request_templates").join("default.md"),
+            ];
+            
+            for path in possible_paths {
+                if path.exists() {
+                    if let Ok(content) = fs::read_to_string(&path) {
+                        return Some(content);
+                    }
+                }
             }
         }
         

@@ -1,5 +1,13 @@
 use crate::{AppResult, AppContext, Config, git::GitOps, utils};
 
+fn get_pr_template(config: &Config) -> Option<String> {
+    if let Some(ref content) = config.pr_template_content {
+        return Some(content.clone());
+    }
+    
+    config.get_pr_template()
+}
+
 pub async fn run() -> AppResult<()> {
     let config = Config::load()?;
     config.validate()?;
@@ -39,10 +47,19 @@ pub async fn run() -> AppResult<()> {
             spinner.finish_and_clear();
             let title = format!("[{}] {}", issue.key, issue.fields.summary);
             let jira_url = context.config().get_jira_ticket_url(&issue.key);
-            let body = format!(
-                "## 관련 티켓\n{}\n\n## 변경사항\n- \n\n## 테스트 방법\n- ",
-                jira_url
-            );
+            
+            let body = if let Some(template) = get_pr_template(&context.config()) {
+                template
+                    .replace("{{TICKET_KEY}}", &issue.key)
+                    .replace("{{TICKET_URL}}", &jira_url)
+                    .replace("{{TICKET_TITLE}}", &issue.fields.summary)
+                    .replace("{{BRANCH_NAME}}", &current_branch)
+            } else {
+                format!(
+                    "## 관련 티켓\n{}\n\n## 변경사항\n- \n\n## 테스트 방법\n- ",
+                    jira_url
+                )
+            };
             (title, body)
         }
         Err(e) => {
@@ -50,10 +67,19 @@ pub async fn run() -> AppResult<()> {
             utils::warning_message(&format!("티켓 정보 조회 실패: {}", e));
             let title = format!("[{}] 제목을 입력해주세요", ticket_key);
             let jira_url = context.config().get_jira_ticket_url(&ticket_key);
-            let body = format!(
-                "## 관련 티켓\n{}\n\n## 변경사항\n- \n\n## 테스트 방법\n- ",
-                jira_url
-            );
+            
+            let body = if let Some(template) = get_pr_template(&context.config()) {
+                template
+                    .replace("{{TICKET_KEY}}", &ticket_key)
+                    .replace("{{TICKET_URL}}", &jira_url)
+                    .replace("{{TICKET_TITLE}}", "제목을 입력해주세요")
+                    .replace("{{BRANCH_NAME}}", &current_branch)
+            } else {
+                format!(
+                    "## 관련 티켓\n{}\n\n## 변경사항\n- \n\n## 테스트 방법\n- ",
+                    jira_url
+                )
+            };
             (title, body)
         }
     };
