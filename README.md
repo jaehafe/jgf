@@ -55,29 +55,44 @@ Git 브랜치:  없음 → EM-XXX 생성 → PR → 머지 → 삭제
 ## 🛠 설치 방법
 
 ### Prerequisites
-- Rust 1.70+
 - Git
 - Jira 계정 및 API 토큰
 - GitHub 계정 및 Personal Access Token
 
-### 빌드 및 설치
+### 설치 옵션
 
+#### Option 1: Cargo를 통한 설치 (Rust 필요)
 ```bash
-# Clone
+# crates.io에서 설치 (예정)
+cargo install jgf-cli
+
+# 또는 소스에서 빌드
 git clone https://github.com/yourusername/jgf.git
 cd jgf
-
-# 빌드
-cargo build --release
-
-# 시스템 전역 설치
-sudo cp target/release/jgf /usr/local/bin/
-
-# 또는 cargo install
 cargo install --path .
 ```
 
+#### Option 2: 바이너리 직접 다운로드 (Rust 불필요)
+```bash
+# macOS (Apple Silicon)
+curl -L https://github.com/yourusername/jgf/releases/latest/download/jgf-darwin-aarch64 -o jgf
+chmod +x jgf
+sudo mv jgf /usr/local/bin/
+
+# macOS (Intel)
+curl -L https://github.com/yourusername/jgf/releases/latest/download/jgf-darwin-x64 -o jgf
+chmod +x jgf
+sudo mv jgf /usr/local/bin/
+
+# Linux
+curl -L https://github.com/yourusername/jgf/releases/latest/download/jgf-linux-x64 -o jgf
+chmod +x jgf
+sudo mv jgf /usr/local/bin/
+```
+
 ## ⚙️ 초기 설정
+
+### 프로젝트별 설정 (권장)
 
 각 프로젝트 루트에서 실행:
 
@@ -85,23 +100,49 @@ cargo install --path .
 jgf init
 ```
 
-`.env` 파일 생성 후 수정:
+이 명령은 두 개의 파일을 생성합니다:
+
+#### 1. `jgf.json` - 프로젝트 설정 (Git에 커밋 가능)
+```json
+{
+  "project": "your-project-name",
+  "jira": {
+    "url": "https://your-company.atlassian.net",
+    "project": "EM",
+    "username": "your-email@company.com"  // 선택사항
+  },
+  "github": {
+    "owner": "YourOrg",
+    "repo": "your-repo"
+  },
+  "defaultBranch": "develop"
+}
+```
+
+#### 2. `.env` - 토큰 정보 (`.gitignore`에 추가 필수)
 ```env
-# Jira 설정
+# 토큰 정보는 .env 파일에 저장합니다
+JIRA_TOKEN=your-jira-api-token
+GITHUB_TOKEN=ghp_your_github_token
+
+# Optional: jgf.json에 username이 없을 경우 사용
+# JIRA_USERNAME=your-email@company.com
+```
+
+⚠️ **중요**: `.env` 파일은 반드시 `.gitignore`에 추가하세요!
+
+### 레거시 설정 (하위 호환성)
+
+`jgf.json` 없이 `.env` 파일만으로도 작동합니다:
+```env
 JIRA_URL=https://your-company.atlassian.net
 JIRA_PROJECT=EM
 JIRA_USERNAME=your-email@company.com
 JIRA_TOKEN=your-jira-api-token
-
-# GitHub 설정
 GITHUB_TOKEN=ghp_your_github_token
 REPO_OWNER=YourOrg
 REPO_NAME=your-repo
-
-# Git 설정
 DEFAULT_BRANCH=develop
-
-# 프로젝트 설정
 PROJECT_NAME=your-project
 ```
 
@@ -239,6 +280,42 @@ $ jgf sync
 ### 브랜치 네이밍
 - 기본: `{JIRA_TICKET_NUMBER}` (예: `EM-100`)
 - 수정 필요시 `src/config.rs`의 `format_branch_name()` 함수 수정
+
+### PR 템플릿 자동 탐색
+jgf는 프로젝트의 PR 템플릿을 자동으로 찾아 사용합니다:
+- `.github/pull_request_template.md`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+- `pull_request_template.md`
+- `docs/pull_request_template.md`
+- `.gitlab/merge_request_templates/default.md`
+
+### 여러 프로젝트 관리
+각 프로젝트에 독립적인 `jgf.json`을 생성하여 관리:
+
+```bash
+# Frontend 프로젝트
+cd ~/projects/frontend
+jgf init  # frontend용 jgf.json 생성
+
+# Backend 프로젝트
+cd ~/projects/backend
+jgf init  # backend용 jgf.json 생성
+
+# 각 프로젝트에서 독립적으로 작동
+cd ~/projects/frontend && jgf tickets  # frontend 설정 사용
+cd ~/projects/backend && jgf tickets   # backend 설정 사용
+```
+
+### 설정 파일 우선순위
+1. 현재 디렉토리부터 상위로 탐색하여 `jgf.json` 찾기
+2. `jgf.json`이 있으면 해당 설정 + 같은 위치의 `.env` 사용
+3. 없으면 전역 `.env` 파일 사용 (레거시 모드)
+
+## 📁 예제 파일
+
+프로젝트에 포함된 예제 파일:
+- `jgf.json.example` - 프로젝트 설정 예제
+- `.env.example` - 토큰 설정 예제
 
 ## 🔧 문제 해결
 
