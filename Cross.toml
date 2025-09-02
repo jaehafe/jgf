@@ -1,0 +1,7 @@
+[build.env]
+passthrough = [
+    "CI",
+    "GITHUB_TOKEN",
+    "CARGO_HOME",
+    "CARGO_TARGET_DIR",
+]

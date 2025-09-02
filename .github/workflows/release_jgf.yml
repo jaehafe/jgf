@@ -102,6 +102,8 @@ jobs:
 
       - name: Build
         shell: bash
+        env:
+          TARGET_CC: clang
         run: |
           cross build --release --bin jgf --target=${{ matrix.target }}
 

@@ -1,6 +1,6 @@
 [package]
 name = "jgf"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Lee Jaeha <wogkdkrm112@gmail.com>"]
 edition = "2024"
 description = "Jira-GitHub Flow CLI tool for seamless project management"
@@ -19,10 +19,10 @@ clap = { version = "4.5.45", features = ["derive"] }
 colored = "3.0.0"
 console = "0.15.8"
 dotenv = "0.15.0"
-git2 = "0.20.2"
+git2 = { version = "0.20.2", default-features = false }
 indicatif = "0.18.0"
 inquire = "0.7.5"
-reqwest = { version = "0.12.23", features = ["json"] }
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.143"
 strum = { version = "0.26", features = ["derive"] }
