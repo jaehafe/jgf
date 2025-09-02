@@ -1,0 +1,13 @@
+{
+  "project": "edumong-fe",
+  "jira": {
+    "url": "https://lemong-hq.atlassian.net",
+    "project": "EM",
+    "username": "jaeha@lemong.ai"
+  },
+  "github": {
+    "owner": "Lemong23",
+    "repo": "edumong-fe"
+  },
+  "defaultBranch": "develop"
+}
