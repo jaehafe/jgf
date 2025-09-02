@@ -9,5 +9,8 @@
     "owner": "Lemong23",
     "repo": "edumong-fe"
   },
-  "defaultBranch": "develop"
+  "defaultBranch": "develop",
+  "prTemplate": {
+    "path": ".github/pull_request_template.md"
+  }
 }
