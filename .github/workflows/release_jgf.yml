@@ -96,6 +96,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           shared-key: release-${{ matrix.target }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Add Rust Target
         run: rustup target add ${{ matrix.target }}
