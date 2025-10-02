@@ -2,7 +2,6 @@ use crate::error::{AppError, AppErrorType, AppResult, AppErrorExt};
 use super::models::*;
 use base64::Engine;
 use reqwest::{header, Client, Response};
-use serde_json::json;
 
 pub struct JiraClient {
     pub base_url: String,
@@ -106,60 +105,60 @@ impl JiraClient {
     }
     
     pub async fn search_assigned_issues(&self, assignee_email: &str, max_results: Option<i32>) -> AppResult<SearchResults> {
-        let jql = format!("project = {} AND assignee = \"{}\" ORDER BY priority DESC, updated DESC", 
+        let jql = format!("project = {} AND assignee = \"{}\" ORDER BY priority DESC, updated DESC",
                          self.project_key, assignee_email);
-        
-        let url = format!("{}/rest/api/3/search", self.base_url);
+
+        let url = format!("{}/rest/api/3/search/jql", self.base_url);
         let max_results = max_results.unwrap_or(50);
-        
-        let body = json!({
-            "jql": jql,
-            "maxResults": max_results,
-            "startAt": 0,
-            "fields": [
-                "summary", "description", "status", "priority", 
-                "assignee", "reporter", "created", "updated",
-                "issuetype", "project"
-            ]
-        });
-        
+
+        let fields = vec![
+            "summary", "description", "status", "priority",
+            "assignee", "reporter", "created", "updated",
+            "issuetype", "project"
+        ].join(",");
+
         let response = self
             .client
-            .post(&url)
-            .json(&body)
+            .get(&url)
+            .query(&[
+                ("jql", jql.as_str()),
+                ("maxResults", &max_results.to_string()),
+                ("startAt", "0"),
+                ("fields", &fields),
+            ])
             .send()
             .await
             .with_app_type(AppErrorType::JiraConnectionError)?;
-        
+
         self.handle_response(response, "할당된 이슈 검색").await
     }
     
     pub async fn search_issues_by_status(&self, status: &str, max_results: Option<i32>) -> AppResult<SearchResults> {
-        let jql = format!("project = {} AND status = \"{}\" ORDER BY updated DESC", 
+        let jql = format!("project = {} AND status = \"{}\" ORDER BY updated DESC",
                          self.project_key, status);
-        
-        let url = format!("{}/rest/api/3/search", self.base_url);
+
+        let url = format!("{}/rest/api/3/search/jql", self.base_url);
         let max_results = max_results.unwrap_or(50);
-        
-        let body = json!({
-            "jql": jql,
-            "maxResults": max_results,
-            "startAt": 0,
-            "fields": [
-                "summary", "description", "status", "priority", 
-                "assignee", "reporter", "created", "updated",
-                "issuetype", "project"
-            ]
-        });
-        
+
+        let fields = vec![
+            "summary", "description", "status", "priority",
+            "assignee", "reporter", "created", "updated",
+            "issuetype", "project"
+        ].join(",");
+
         let response = self
             .client
-            .post(&url)
-            .json(&body)
+            .get(&url)
+            .query(&[
+                ("jql", jql.as_str()),
+                ("maxResults", &max_results.to_string()),
+                ("startAt", "0"),
+                ("fields", &fields),
+            ])
             .send()
             .await
             .with_app_type(AppErrorType::JiraConnectionError)?;
-        
+
         self.handle_response(response, &format!("상태별 이슈 검색: {}", status)).await
     }
     
