@@ -9,8 +9,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - npm/jgf/package.json
+    # paths:
+    #   - npm/jgf/package.json
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -161,8 +161,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Generate npm packages
         run: |
