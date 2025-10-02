@@ -1,7 +1,5 @@
 name: Release JGF
 
-permissions: {}
-
 on:
   workflow_dispatch:
   push:
