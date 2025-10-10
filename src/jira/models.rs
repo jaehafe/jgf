@@ -76,10 +76,10 @@ pub struct Project {
 pub struct SearchResults {
     pub expand: Option<String>,
     #[serde(rename = "startAt")]
-    pub start_at: i32,
+    pub start_at: Option<i32>,
     #[serde(rename = "maxResults")]
-    pub max_results: i32,
-    pub total: i32,
+    pub max_results: Option<i32>,
+    pub total: Option<i32>,
     pub issues: Vec<Issue>,
 }
 
